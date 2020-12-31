@@ -1,20 +1,17 @@
 package driver;
 
+/**
+ * USAGE: JavaPortScanner [target IP] [port range]
+ * <ul>
+ * <li><target IP>: IP address to scan</li>
+ * <li><port range>: range of ports to scan</li>
+ * <ul>
+ * <li>e.g. 80-100 scans from 80 to 100</li>
+ * <li>e.g. 8080 scans only port 8080</li>
+ * </ul>
+ */
 public class Driver {
 
-    private String targetIP;
-    private int[] portRange;
-
-    /**
-     * This method is called as soon as the program is started.
-     * Sets up necessary parameters such as IP address and port range to scan.
-     *
-     * @param args
-     */
-    private static void setup(String[] args) throws InvalidUserInputException {
-        System.out.println("help");
-        throw new InvalidUserInputException("ip");
-    }
     public static void main(String[] args) {
         // System.out.println("Hello, World!");
     }
