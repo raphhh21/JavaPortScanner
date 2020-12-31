@@ -6,14 +6,12 @@ import java.net.Socket;
 
 public class PortScanner {
 
-    public boolean scan(String ip, int port, int timeout) {
-        try {
-            Socket sfd = new Socket();
+    public boolean isPortOpen(String ip, int port, int timeout) {
+        try (Socket sfd = new Socket()) {
             sfd.connect(new InetSocketAddress(ip, port), timeout);
-            sfd.close();
             // connection ok
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             // connection failed
             return false;
         }
