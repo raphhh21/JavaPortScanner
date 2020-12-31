@@ -15,7 +15,7 @@ public class InvalidUserInputException extends Exception {
 
     /**
      * Constructor for InvalidUserInputException. Parameter 'field' must be
-     * either "ip", "port", or "both" to indicate which inputs are invalid.
+     * either "ip", "port", or "default" to indicate which inputs are invalid.
      *
      * @param field indicate which user-inputs are invalid
      */
@@ -24,17 +24,17 @@ public class InvalidUserInputException extends Exception {
                 || field.equals("both"))) {
             this.invalidInputField = field;
         } else {
-            // set to "both" if field is non-acceptable
-            this.invalidInputField = "both";
+            // set to "default" when field is non-acceptable
+            this.invalidInputField = "default";
         }
     }
 
     @Override
     public String getMessage() {
-        // generic message
+        // generic default message
         String ret = "Invalid user input";
 
-        if (!this.invalidInputField.equals("both")) {
+        if (!this.invalidInputField.equals("default")) {
             // more specific message
             ret += ": " + this.invalidInputField;
         }
