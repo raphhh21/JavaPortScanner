@@ -96,7 +96,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testInvalidPortRange() throws InvalidUserInputException {
+    public void testInvalidPortRangeAlphanumericInput() throws InvalidUserInputException {
         // expects exception
         exceptionRule.expect(InvalidUserInputException.class);
         exceptionRule.expectMessage("Invalid user input: port");
@@ -104,6 +104,18 @@ public class ParserTest {
         // user input alphanumeric port range
         userArgs.add(SAMPLE_IP_ADDR);
         userArgs.add("24a-df");
+        Parser.run(getUserArgs());
+    }
+
+    @Test
+    public void testInvalidPortRangeMultipleDashes() throws InvalidUserInputException {
+        // expects exception too
+        exceptionRule.expect(InvalidUserInputException.class);
+        exceptionRule.expectMessage("Invalid user input: port");
+
+        // user input multiple dashes for port range
+        userArgs.add(SAMPLE_IP_ADDR);
+        userArgs.add("14--15");
         Parser.run(getUserArgs());
     }
 
