@@ -2,17 +2,24 @@ package scanner;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-public class PortScanner {
+public final class PortScanner {
 
-    public boolean isPortOpen(String ip, int port, int timeout) {
-        try (Socket sfd = new Socket()) {
-            sfd.connect(new InetSocketAddress(ip, port), timeout);
-            // connection ok
-            return true;
-        } catch (Exception e) {
-            // connection failed
-            return false;
-        }
+    public static Future<Boolean> isPortOpen(PortScannerResult r,
+            ExecutorService es, String ip, int port, int timeout) {
+        return es.submit(() -> {
+            try (Socket sfd = new Socket()) {
+                sfd.connect(new InetSocketAddress(ip, port), timeout);
+                // connection ok
+                r.getOpenList().add(port);
+                return true;
+            } catch (Exception e) {
+                // connection failed
+                r.getCloseList().add(port);
+                return false;
+            }
+        });
     }
 }

@@ -3,7 +3,7 @@ package scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PortScannerResult {
+public final class PortScannerResult {
 
     /**
      * List of open ports of the target.

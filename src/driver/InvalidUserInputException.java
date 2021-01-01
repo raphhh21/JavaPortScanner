@@ -1,6 +1,6 @@
 package driver;
 
-public class InvalidUserInputException extends Exception {
+public final class InvalidUserInputException extends Exception {
 
     /**
      * IDE-generated serialVersionUID to suppress the warning.

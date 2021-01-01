@@ -1,6 +1,6 @@
 package driver;
 
-public class Parser {
+public final class Parser {
 
     /**
      * Get target information from user inputs.

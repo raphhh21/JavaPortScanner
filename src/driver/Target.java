@@ -1,6 +1,6 @@
 package driver;
 
-public class Target {
+public final class Target {
     public String targetIP;
     public int[] portRange;
 
