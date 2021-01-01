@@ -103,7 +103,7 @@ public class ParserTest {
 
         // user input alphanumeric port range
         userArgs.add(SAMPLE_IP_ADDR);
-        userArgs.add("24a-df");
+        userArgs.add("24a-d3f");
         Parser.run(getUserArgs());
     }
 

@@ -43,6 +43,7 @@ public class Parser {
             }
 
         } catch (Exception e) {
+            // could not convert port num to int
             throw new InvalidUserInputException("port");
         }
 
