@@ -47,6 +47,21 @@ public final class Parser {
             throw new InvalidUserInputException("port");
         }
 
+        // check if ports are in valid range
+        if (!isValidPortNumber(ret.portRange[0]) || !isValidPortNumber(ret.portRange[1])) {
+            throw new InvalidUserInputException("port");
+        }
+
         return ret;
+    }
+
+    /**
+     * Return true iff portNum is in valid range, 1 to 65535.
+     *
+     * @param portNum port number to check.
+     * @return whether portNum is a valid port number.
+     */
+    private static boolean isValidPortNumber(int portNum) {
+        return (1 <= portNum && portNum <= 65535);
     }
 }
