@@ -33,10 +33,9 @@ public final class PortScannerResult {
         return this.resultList;
     }
 
-    public List<PortStatus> addPortStatus(int portNum, boolean isOpen) {
+    public void addPortStatus(int portNum, boolean isOpen) {
         PortStatus newStatus = new PortStatus(portNum, isOpen);
         this.resultList.add(newStatus);
-        return this.resultList;
     }
 
 }
