@@ -5,27 +5,32 @@ import java.util.List;
 
 public final class PortScannerResult {
 
-    /**
-     * List of open ports of the target.
-     */
-    private List<Integer> openList;
+    private final class PortStatus {
+        @SuppressWarnings("unused")
+        public int portNum;
+        @SuppressWarnings("unused")
+        public boolean isOpen;
 
-    /**
-     * List of closed ports of the target.
-     */
-    private List<Integer> closeList;
+        public PortStatus(int portNum, boolean isOpen) {
+            this.portNum = portNum;
+            this.isOpen = isOpen;
+        }
+    }
+
+    private List<PortStatus> resultList;
 
     public PortScannerResult() {
-        openList = new ArrayList<>();
-        closeList = new ArrayList<>();
+        resultList = new ArrayList<>();
     }
 
-    public List<Integer> getOpenList() {
-        return this.openList;
+    public List<PortStatus> getResultList() {
+        return this.resultList;
     }
 
-    public List<Integer> getCloseList() {
-        return this.closeList;
+    public List<PortStatus> addPortStatus(int portNum, boolean isOpen) {
+        PortStatus newStatus = new PortStatus(portNum, isOpen);
+        this.resultList.add(newStatus);
+        return this.resultList;
     }
 
 }
