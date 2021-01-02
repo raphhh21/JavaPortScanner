@@ -1,12 +1,14 @@
 package driver;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import scanner.PortScanner;
 import scanner.PortScannerResult;
+import scanner.PortScannerResult.PortStatus;
 
 /**
  * USAGE: JavaPortScanner [target IP] [port range]
@@ -23,7 +25,7 @@ public class Driver {
     private static final int SCAN_TIMEOUT = 200;
 
     public static void main(String[] args) {
-        // get a Target info
+        // get a Target info from Parser
         Target t = null;
         try {
             t = Parser.run(args);
@@ -45,6 +47,10 @@ public class Driver {
             futures.add(PortScanner.isPortOpen(r, es, t.targetIP, currPort, SCAN_TIMEOUT));
         }
         es.shutdown();
+
+        // sort result list by portNum
+        r.getResultList().sort(Comparator.comparing(PortStatus::getPortNum));
+
 
         // TODO: display the results
 
