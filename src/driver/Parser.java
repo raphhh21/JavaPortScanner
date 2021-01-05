@@ -1,5 +1,8 @@
 package driver;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public final class Parser {
 
     /**
@@ -10,17 +13,27 @@ public final class Parser {
     public static Target run(String[] args) throws InvalidUserInputException {
         Target ret = new Target();
 
-        if (args.length != 2) {
+        if (args.length != 2 && args.length != 1) {
             throw new InvalidUserInputException("default");
         }
 
         // set ip
-        ret.targetIP = args[0];
+        if (isValidIPv4Address(args[0])) {
+            ret.targetIP = args[0];
+        } else {
+            // invalid ip
+            throw new InvalidUserInputException("ip");
+        }
 
         // set port range
         String targetPortStart;
         String targetPortEnd;
-        if (args[1].contains("-")) {
+
+        if (args.length == 1) {
+            // target all possible port if provided ip is valid
+            targetPortStart = "1";
+            targetPortEnd = "65535";
+        } else if (args[1].contains("-")) {
             // is a range
 
             // first occurrence of dash
@@ -63,5 +76,19 @@ public final class Parser {
      */
     private static boolean isValidPortNumber(int portNum) {
         return (1 <= portNum && portNum <= 65535);
+    }
+
+    /**
+     * Validate provided IPv4 address.
+     *
+     * @param ip
+     * @return whether ip is a valid IPv4 Address
+     */
+    private static boolean isValidIPv4Address(String ip) {
+        try {
+            return InetAddress.getByName(ip).getHostAddress().equals(ip);
+        } catch (UnknownHostException e) {
+            return false;
+        }
     }
 }

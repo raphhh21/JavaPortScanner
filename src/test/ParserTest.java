@@ -1,5 +1,6 @@
 package test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -85,17 +86,6 @@ public class ParserTest {
     }
 
     @Test
-    public void testMissingPortInput() throws InvalidUserInputException {
-        // expects exception
-        exceptionRule.expect(InvalidUserInputException.class);
-        exceptionRule.expectMessage("Invalid user input");
-
-        // user only input IP address
-        userArgs.add(SAMPLE_IP_ADDR);
-        Parser.run(getUserArgs());
-    }
-
-    @Test
     public void testInvalidPortRangeAlphanumericInput() throws InvalidUserInputException {
         // expects exception
         exceptionRule.expect(InvalidUserInputException.class);
@@ -119,4 +109,18 @@ public class ParserTest {
         Parser.run(getUserArgs());
     }
 
+    @Test
+    public void testValidPortRangeAllPorts() {
+        Target exp = getExpectedTarget(SAMPLE_IP_ADDR, 1, 65535);
+        Target act = null;
+        userArgs.add(SAMPLE_IP_ADDR);
+
+        try {
+            act = Parser.run(getUserArgs());
+            assertArrayEquals(exp.portRange, act.portRange);
+            assertEquals(exp.targetIP, act.targetIP);
+        } catch (Exception e) {
+            fail("Unexpected Exception :O");
+        }
+    }
 }
