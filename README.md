@@ -4,10 +4,10 @@ Simple port scanner written in Java with parallelization support.
 
 ## Usage
 
-`$ java -jar JavaPortScanner.jar <IPv4> [PortRange]`
+`$ java -jar JavaPortScanner.jar <IPv4> [PortStart-PortEnd]`
 
 - `<IPv4>` is a required parameter that is a valid IPv4 address
-- `[PortRange]` is an optional parameter
+- `[PortStart-PortEnd]` is an optional parameter to indicate certain range of ports to scan
   - If this is empty, scanner will try to scan all possible ports (can take a long time)
   - `PortStart-PortEnd` will scan from `PortStart` to `PortEnd`
 
