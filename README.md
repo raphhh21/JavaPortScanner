@@ -1,6 +1,6 @@
 # Java Port Scanner
 
-Very simple port scanner using multiple threads written in Java.
+Simple port scanner written in Java with parallelization support.
 
 ## Usage
 
