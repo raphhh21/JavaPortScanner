@@ -1,9 +1,14 @@
 package driver;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import scanner.PortScanner;
 import scanner.PortScannerResult;
-import scanner.PortScannerResult.PortStatus;
+import scanner.PortStatus;
 
 /**
  * USAGE: JavaPortScanner [target IP] [port range]
@@ -19,6 +24,7 @@ import scanner.PortScannerResult.PortStatus;
 public class Driver {
 
     private static final int SCAN_TIMEOUT = 200;
+    private static final int THREAD_COUNT = 64;
 
     public static void main(String[] args) {
         // get a Target info from Parser
@@ -33,17 +39,40 @@ public class Driver {
 
         // run a scan on the target and get a result
         System.out.println("Scanning " + t.targetIP + ":" + t.portRange[0] + "-" + t.portRange[1]);
-        // result to populate
-        PortScannerResult r = new PortScannerResult();
+
+        // lists to populate
+        List<Future<PortStatus>> futureList = new ArrayList<>();
+        List<PortStatus> resultList = new ArrayList<>();
+
+        // ExecutorService
+        ExecutorService es = Executors.newFixedThreadPool(THREAD_COUNT);
 
         // loop through provided port range
         for (int currPort = t.portRange[0]; currPort <= t.portRange[1]; currPort++) {
-            PortScanner.isPortOpen(r, t.targetIP, currPort, SCAN_TIMEOUT);
+            futureList.add(PortScanner.isPortOpen(es, t.targetIP, currPort, SCAN_TIMEOUT));
         }
 
-        // sort result list by portNum
-        r.getResultList().sort(Comparator.comparing(PortStatus::getPortNum));
+        es.shutdown();
+        try {
+            if (!es.awaitTermination(1, TimeUnit.MINUTES)) {
+                // timeout elapsed before termination
+                es.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            es.shutdownNow();
+        }
 
+        // get results to resultList
+        for (Future<PortStatus> eachFuture : futureList) {
+            try {
+                resultList.add(eachFuture.get(SCAN_TIMEOUT, TimeUnit.MILLISECONDS));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // display results
+        PortScannerResult r = new PortScannerResult(resultList);
         System.out.println(r);
     }
 }

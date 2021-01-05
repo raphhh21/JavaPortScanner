@@ -1,15 +1,16 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import scanner.PortScanner;
-import scanner.PortScannerResult;
-import scanner.PortScannerResult.PortStatus;
+import scanner.PortStatus;
 
 public class PortScannerTest {
 
@@ -18,10 +19,14 @@ public class PortScannerTest {
     private static final String GOOGLE_IP = "64.233.185.139";
 
     private ExecutorService es;
+    private List<PortStatus> expected;
+    private List<PortStatus> actual;
 
     @Before
     public void setup() {
         es = Executors.newFixedThreadPool(THREAD_COUNT);
+        expected = new ArrayList<>();
+        actual = new ArrayList<>();
     }
 
     /**
@@ -30,22 +35,11 @@ public class PortScannerTest {
      * @param ip        target IP address
      * @param portStart start of port range
      * @param portEnd   end of port range
-     * @return populated PortScannerResult
      */
-    private PortScannerResult getResult(String ip, int portStart, int portEnd) {
-        PortScannerResult r = new PortScannerResult();
-
+    private void getResults(String ip, int portStart, int portEnd) {
+        List<Future<PortStatus>> futures = new ArrayList<>();
         for (int port = portStart; port <= portEnd; port++) {
-            PortScanner sc = new PortScanner(r, ip, port, TIMEOUT);
-
-            Runnable scanRunnable = () -> {
-                // ! TBD
-                System.out.println("RUN:\t" + sc.getThreadName());
-
-                sc.runScan();
-            };
-
-            es.execute(scanRunnable);
+            futures.add(PortScanner.isPortOpen(es, ip, port, TIMEOUT));
         }
 
         es.shutdown();
@@ -57,17 +51,24 @@ public class PortScannerTest {
         } catch (InterruptedException e) {
             es.shutdownNow();
         }
-        return r;
+
+        List<PortStatus> resultList = new ArrayList<>();
+
+        for (Future<PortStatus> eachFuture : futures) {
+            try {
+                resultList.add(eachFuture.get(TIMEOUT, TimeUnit.MILLISECONDS));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        actual = resultList;
     }
 
-    private void runCompare(PortScannerResult exp, PortScannerResult act) {
-        assertEquals(exp.getCloseCount(), act.getCloseCount());
-        assertEquals(exp.getOpenCount(), act.getOpenCount());
-
-        // list of expected and actual have same size here
-        for (int i = 0; i < exp.getResultList().size(); i++) {
-            PortStatus expStatus = exp.getResultList().get(i);
-            PortStatus actStatus = act.getResultList().get(i);
+    private void runCompare() {
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            PortStatus expStatus = expected.get(i);
+            PortStatus actStatus = actual.get(i);
             assertEquals(expStatus.getPortNum(), actStatus.getPortNum());
             assertEquals(expStatus.getIsOpen(), actStatus.getIsOpen());
         }
@@ -75,35 +76,17 @@ public class PortScannerTest {
 
     @Test
     public void testScanGoogleSinglePort() {
-        PortScannerResult exp = new PortScannerResult();
-        exp.addPortStatus(80, true);
-
-        PortScannerResult act = getResult(GOOGLE_IP, 80, 80);
-
-        // ! TBD
-        System.out.println("===EXP===");
-        System.out.println(exp);
-        System.out.println("===ACT===");
-        System.out.println(act);
-
-        runCompare(exp, act);
+        expected.add(new PortStatus(80, true));
+        getResults(GOOGLE_IP, 80, 80);
+        runCompare();
     }
 
     @Test
     public void testScanGoogleMultiplePorts() {
-        PortScannerResult exp = new PortScannerResult();
         for (int i = 80; i <= 443; i++) {
-            exp.addPortStatus(i, i == 80 || i == 443);
+            expected.add(new PortStatus(i, (i == 80 || i == 443)));
         }
-
-        PortScannerResult act = getResult(GOOGLE_IP, 80, 443);
-
-        // ! TBD
-        System.out.println("===EXP===");
-        System.out.println(exp);
-        System.out.println("===ACT===");
-        System.out.println(act);
-
-        runCompare(exp, act);
+        getResults(GOOGLE_IP, 80, 443);
+        runCompare();
     }
 }

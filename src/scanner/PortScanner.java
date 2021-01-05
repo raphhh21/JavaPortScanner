@@ -2,56 +2,32 @@ package scanner;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public final class PortScanner {
 
-    private String threadName;
+    public static Future<PortStatus> isPortOpen(ExecutorService es, String ip, int port,
+            int timeout) {
+        return es.submit(new Callable<PortStatus>() {
 
-    private PortScannerResult r;
-    private String targetIP;
-    private int targetPort;
-    private int timeout;
+            @Override
+            public PortStatus call() {
 
-    public PortScanner(PortScannerResult r, String targetIP, int targetPort, int timeout) {
-        this.r = r;
-        this.targetIP = targetIP;
-        this.targetPort = targetPort;
-        this.timeout = timeout;
-        this.threadName = targetIP + ":" + targetPort;
-    }
-
-    public String getThreadName() {
-        return this.threadName;
-    }
-
-    public void runScan() {
-
-        boolean stat;
-        try (Socket sfd = new Socket()) {
-            sfd.connect(new InetSocketAddress(targetIP, targetPort), timeout);
-            stat = true;
-        } catch (Exception e) {
-            stat = false;
-        }
-        if (r != null) {
-            r.addPortStatus(targetPort, stat);
-        }
-    }
-
-    public static void isPortOpen(PortScannerResult r, String ip, int port, int timeout) {
-        boolean stat;
-        try (Socket sfd = new Socket()) {
-            sfd.connect(new InetSocketAddress(ip, port), timeout);
-            // connection ok
-            // r.getOpenList().add(port);
-            stat = true;
-        } catch (Exception e) {
-            // connection failed
-            // r.getCloseList().add(port);
-            stat= false;
-        }
-        if (r != null) {
-            r.addPortStatus(port, stat);
-        }
+                boolean stat;
+                try (Socket sfd = new Socket()) {
+                    sfd.connect(new InetSocketAddress(ip, port), timeout);
+                    // connection ok
+                    // r.getOpenList().add(port);
+                    stat = true;
+                } catch (Exception e) {
+                    // connection failed
+                    // r.getCloseList().add(port);
+                    stat = false;
+                }
+                return new PortStatus(port, stat);
+            }
+        });
     }
 }
