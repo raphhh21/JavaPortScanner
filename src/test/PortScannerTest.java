@@ -1,8 +1,10 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import scanner.PortScanner;
@@ -12,7 +14,7 @@ import scanner.PortScannerResult.PortStatus;
 public class PortScannerTest {
 
     private static final int TIMEOUT = 200;
-    private static final int THREAD_COUNT = 32;
+    private static final int THREAD_COUNT = 16;
     private static final String GOOGLE_IP = "64.233.185.139";
 
     private ExecutorService es;
@@ -35,12 +37,26 @@ public class PortScannerTest {
 
         for (int port = portStart; port <= portEnd; port++) {
             PortScanner sc = new PortScanner(r, ip, port, TIMEOUT);
+
             Runnable scanRunnable = () -> {
+                // ! TBD
+                System.out.println("RUN:\t" + sc.getThreadName());
+
                 sc.runScan();
             };
+
             es.execute(scanRunnable);
         }
+
         es.shutdown();
+        try {
+            if (!es.awaitTermination(1, TimeUnit.MINUTES)) {
+                // timeout elapsed before termination
+                es.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            es.shutdownNow();
+        }
         return r;
     }
 
