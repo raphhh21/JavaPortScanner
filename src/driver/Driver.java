@@ -1,11 +1,6 @@
 package driver;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import scanner.PortScanner;
 import scanner.PortScannerResult;
 import scanner.PortScannerResult.PortStatus;
@@ -37,19 +32,14 @@ public class Driver {
         }
 
         // run a scan on the target and get a result
-        System.out.println(
-                "Scanning " + t.targetIP + ":" + t.portRange[0] + "-" + t.portRange[1]);
-        // 16 threads
-        ExecutorService es = Executors.newFixedThreadPool(16);
-        List<Future<Boolean>> futures = new ArrayList<>();
+        System.out.println("Scanning " + t.targetIP + ":" + t.portRange[0] + "-" + t.portRange[1]);
         // result to populate
         PortScannerResult r = new PortScannerResult();
 
         // loop through provided port range
         for (int currPort = t.portRange[0]; currPort <= t.portRange[1]; currPort++) {
-            futures.add(PortScanner.isPortOpen(r, es, t.targetIP, currPort, SCAN_TIMEOUT));
+            PortScanner.isPortOpen(r, t.targetIP, currPort, SCAN_TIMEOUT);
         }
-        es.shutdown();
 
         // sort result list by portNum
         r.getResultList().sort(Comparator.comparing(PortStatus::getPortNum));
