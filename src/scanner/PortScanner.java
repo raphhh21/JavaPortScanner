@@ -5,6 +5,8 @@ import java.net.Socket;
 
 public final class PortScanner {
 
+    private String threadName;
+
     private PortScannerResult r;
     private String targetIP;
     private int targetPort;
@@ -15,12 +17,14 @@ public final class PortScanner {
         this.targetIP = targetIP;
         this.targetPort = targetPort;
         this.timeout = timeout;
+        this.threadName = targetIP + ":" + targetPort;
+    }
+
+    public String getThreadName() {
+        return this.threadName;
     }
 
     public void runScan() {
-
-        // ! TBD !!!!!!!!!!!!
-        System.out.println("RUN: " + targetIP + ":" + targetPort);
 
         boolean stat;
         try (Socket sfd = new Socket()) {
