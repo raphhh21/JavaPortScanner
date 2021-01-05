@@ -7,8 +7,8 @@ import java.util.concurrent.Future;
 
 public final class PortScanner {
 
-    public static Future<Boolean> isPortOpen(PortScannerResult r,
-            ExecutorService es, String ip, int port, int timeout) {
+    public static Future<Boolean> isPortOpen(PortScannerResult r, ExecutorService es, String ip,
+            int port, int timeout) {
         return es.submit(() -> {
             try (Socket sfd = new Socket()) {
                 sfd.connect(new InetSocketAddress(ip, port), timeout);
