@@ -1,2 +1,3 @@
-# ignore referenced library on my local machine
-lib/*.jar
+bin/
+.classpath
+.project
