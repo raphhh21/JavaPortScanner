@@ -13,6 +13,7 @@ public class PortScannerTest {
 
     private static final int TIMEOUT = 200;
     private static final int THREAD_COUNT = 32;
+    private static final String GOOGLE_IP = "64.233.185.139";
 
     private ExecutorService es;
 
@@ -24,17 +25,22 @@ public class PortScannerTest {
     /**
      * This simulates how driver will scan but this will return PortScannerResult obj for testing.
      *
-     * @param ip target IP address
+     * @param ip        target IP address
      * @param portStart start of port range
-     * @param portEnd end of port range
+     * @param portEnd   end of port range
      * @return populated PortScannerResult
      */
     private PortScannerResult getResult(String ip, int portStart, int portEnd) {
         PortScannerResult r = new PortScannerResult();
 
         for (int port = portStart; port <= portEnd; port++) {
-            PortScanner.isPortOpen(r, ip, port, TIMEOUT);
+            PortScanner sc = new PortScanner(r, ip, port, TIMEOUT);
+            Runnable scanRunnable = () -> {
+                sc.runScan();
+            };
+            es.execute(scanRunnable);
         }
+        es.shutdown();
         return r;
     }
 
@@ -49,15 +55,38 @@ public class PortScannerTest {
             assertEquals(expStatus.getPortNum(), actStatus.getPortNum());
             assertEquals(expStatus.getIsOpen(), actStatus.getIsOpen());
         }
-
     }
 
     @Test
-    public void testScanGoogle() {
+    public void testScanGoogleSinglePort() {
         PortScannerResult exp = new PortScannerResult();
         exp.addPortStatus(80, true);
 
-        PortScannerResult act = getResult("64.233.185.139", 80, 80);
+        PortScannerResult act = getResult(GOOGLE_IP, 80, 80);
+
+        // ! TBD
+        System.out.println("===EXP===");
+        System.out.println(exp);
+        System.out.println("===ACT===");
+        System.out.println(act);
+
+        runCompare(exp, act);
+    }
+
+    @Test
+    public void testScanGoogleMultiplePorts() {
+        PortScannerResult exp = new PortScannerResult();
+        for (int i = 80; i <= 443; i++) {
+            exp.addPortStatus(i, i == 80 || i == 443);
+        }
+
+        PortScannerResult act = getResult(GOOGLE_IP, 80, 443);
+
+        // ! TBD
+        System.out.println("===EXP===");
+        System.out.println(exp);
+        System.out.println("===ACT===");
+        System.out.println(act);
 
         runCompare(exp, act);
     }

@@ -78,7 +78,9 @@ public final class PortScannerResult {
         StringBuilder sb = new StringBuilder();
         sb.append(openCount + "/" + totalCount + " are open\n");
         for (PortStatus ps : resultList) {
-            sb.append(ps.toString() + "\n");
+            if (ps.isOpen) {
+                sb.append(ps.toString() + "\n");
+            }
         }
         return sb.toString();
     }
