@@ -1,7 +1,9 @@
 package test;
 
 import static org.junit.Assert.assertEquals;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.junit.Before;
 import org.junit.Test;
 import scanner.PortScanner;
 import scanner.PortScannerResult;
@@ -10,7 +12,23 @@ import scanner.PortScannerResult.PortStatus;
 public class PortScannerTest {
 
     private static final int TIMEOUT = 200;
+    private static final int THREAD_COUNT = 32;
 
+    private ExecutorService es;
+
+    @Before
+    public void setup() {
+        es = Executors.newFixedThreadPool(THREAD_COUNT);
+    }
+
+    /**
+     * This simulates how driver will scan but this will return PortScannerResult obj for testing.
+     *
+     * @param ip target IP address
+     * @param portStart start of port range
+     * @param portEnd end of port range
+     * @return populated PortScannerResult
+     */
     private PortScannerResult getResult(String ip, int portStart, int portEnd) {
         PortScannerResult r = new PortScannerResult();
 
