@@ -24,7 +24,7 @@ import scanner.PortStatus;
 public class Driver {
 
     private static final int SCAN_TIMEOUT = 200;
-    private static final int THREAD_COUNT = 64;
+    private static final int THREAD_COUNT = 128;
 
     public static void main(String[] args) {
         // get a Target info from Parser
@@ -54,7 +54,7 @@ public class Driver {
 
         es.shutdown();
         try {
-            if (!es.awaitTermination(1, TimeUnit.MINUTES)) {
+            if (!es.awaitTermination(2, TimeUnit.MINUTES)) {
                 // timeout elapsed before termination
                 es.shutdownNow();
             }
@@ -65,9 +65,10 @@ public class Driver {
         // get results to resultList
         for (Future<PortStatus> eachFuture : futureList) {
             try {
-                resultList.add(eachFuture.get(SCAN_TIMEOUT, TimeUnit.MILLISECONDS));
+                resultList.add(eachFuture.get(2, TimeUnit.MINUTES));
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Timeout reached");
+                System.exit(1);
             }
         }
 
