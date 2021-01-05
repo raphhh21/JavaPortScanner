@@ -21,6 +21,17 @@ public final class PortScannerResult {
         public boolean getIsOpen() {
             return this.isOpen;
         }
+
+        @Override
+        public String toString() {
+            String status;
+            if (this.isOpen) {
+                status = "open";
+            } else {
+                status = "closed";
+            }
+            return this.portNum + ":\t" + status;
+        }
     }
 
     private List<PortStatus> resultList;
@@ -59,6 +70,17 @@ public final class PortScannerResult {
 
     public int getCloseCount() {
         return this.closeCount;
+    }
+
+    @Override
+    public String toString() {
+        int totalCount = closeCount + openCount;
+        StringBuilder sb = new StringBuilder();
+        sb.append(openCount + "/" + totalCount + " are open\n");
+        for (PortStatus ps : resultList) {
+            sb.append(ps.toString() + "\n");
+        }
+        return sb.toString();
     }
 
 }

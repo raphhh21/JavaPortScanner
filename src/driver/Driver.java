@@ -13,11 +13,12 @@ import scanner.PortScannerResult.PortStatus;
 /**
  * USAGE: JavaPortScanner [target IP] [port range]
  * <ul>
- * <li><target IP>: IP address to scan</li>
- * <li><port range>: range of ports to scan</li>
+ * <li>[target IP]: IP address to scan</li>
+ * <li>[port range]: range of ports to scan</li>
  * <ul>
  * <li>e.g. 80-100 scans from 80 to 100</li>
  * <li>e.g. 8080 scans only port 8080</li>
+ * </ul>
  * </ul>
  */
 public class Driver {
@@ -36,6 +37,8 @@ public class Driver {
         }
 
         // run a scan on the target and get a result
+        System.out.println(
+                "Scanning " + t.targetIP + ":" + t.portRange[0] + "-" + t.portRange[1]);
         // 16 threads
         ExecutorService es = Executors.newFixedThreadPool(16);
         List<Future<Boolean>> futures = new ArrayList<>();
@@ -51,8 +54,6 @@ public class Driver {
         // sort result list by portNum
         r.getResultList().sort(Comparator.comparing(PortStatus::getPortNum));
 
-
-        // TODO: display the results
-
+        System.out.println(r);
     }
 }
